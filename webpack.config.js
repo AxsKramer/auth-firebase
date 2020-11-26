@@ -1,13 +1,16 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { SourceMapDevToolPlugin } = require("webpack");
 
 module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.[name].js'
+    filename: '[name].js',
+    sourceMapFilename: "[name].js.map"
   },
+  devtool: "source-map",
   resolve: {
     extensions: ['.js', '.jsx'],
   },
@@ -16,22 +19,25 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                "@babel/preset-env",
-                {
-                  "targets": {
-                    "esmodules": true
-                  }
-                } 
-              ], 
-              '@babel/preset-react'
-            ]
-          }
-        }
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  "@babel/preset-env",
+                  {
+                    "targets": {
+                      "esmodules": true
+                    }
+                  } 
+                ], 
+                '@babel/preset-react'
+              ]
+            }
+          },
+          'source-map-loader'
+        ]
       },
       {
         test: /\.html$/,
@@ -62,6 +68,9 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: 'assets/style/[name].css'
+    }),
+    new SourceMapDevToolPlugin({
+      filename: "[name].map"
     })
   ]
 }
